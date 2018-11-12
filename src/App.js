@@ -1,18 +1,19 @@
 import React, {Component} from 'react';
-import l from './TrilogyEd_Dark.svg'
 import  axios from 'axios'
 import './App.css';
 import {
-    Button,
     Container,
     Header,
-    Image,
-    Menu,
     Segment,
-    Input,
-    Icon, Popup
+    Breadcrumb,
+    Loader,
+    Dimmer,
+    Message
 } from 'semantic-ui-react'
 import CourseSelector from "./courseselector";
+import GroupGenerator from "./groupgenerator";
+import MainMenu from "./mainmenu"
+import {averageMeanGrade} from "./helper"
 
 const baseUrl =  "http://localhost:8080/open/v1/";
 
@@ -23,94 +24,145 @@ class App extends Component {
 
         this.state = {
             key: null,
-            currentKey: null,
             course: null,
             coursesList: [],
             students: [],
-            loading: false
+            loading: false,
+            error : null
         }
     }
 
     componentDidMount() {
-        this.setKey("NS4yMDE4LTExLTAyIDE2OjEzOjE1LjA4MTAzMyAtMDMwMCAtMDMgbT0rMzU1OC40MzAyMjk1NzA");
+        //TODO: Only for demo porpose
+        //this.setKey("NS4yMDE4LTExLTAyIDE2OjEzOjE1LjA4MTAzMyAtMDMwMCAtMDMgbT0rMzU1OC40MzAyMjk1NzA");
     }
 
     setKey = (key) => {
-        this.setState({key: key, loading: true})
+        this.setState({key: key, loading: true, error: null, course: null, coursesList: []});
         axios.post(baseUrl + "me", null, {headers: {'Content-Type': 'application/json', 'apiKey': key}}
         ).then(response => {
             console.log(response);
-            this.setState({coursesList: response.data.courses});
+            this.setState({coursesList: response.data.courses, error: null, loading: false});
         }).catch(error => {
             console.log(error);
-            this.setState({loading:false})
+            let err = "";
+            if (error.response.status === 401){
+                err = "The API key '" + this.state.key + "' is invalid. Please insert a valid key to use";
+            } else {
+                err = error.message
+            }
+            this.setState({loading:false, error: err})
         })
-    }
-
-    submitKey = () => {
-        this.setKey(this.state.currentKey);
-    }
-
-    onKeyChange = (e) => {
-        this.setState({currentKey: e.target.value})
-    }
+    };
 
     resetKey = () => {
         this.setState({key: null, course: null})
-    }
+    };
 
-    onCourseSelected = (courseId) =>{
-        console.log("Clicked " + courseId)
-        this.setState({course: courseId})
-    }
+    onCourseSelected = (course) =>{
+        this.setState({loading: false});
+        console.log("Clicked " + course);
+        this.setState({course: course});
+        let payload = { "courseId": course.id};
+        axios.post(baseUrl + "grades", payload, {headers: {'Content-Type': 'application/json', 'apiKey': this.state.key}})
+            .then(response => {
+                console.log("Grades Response");
+                console.log(response);
+                let students = new Map();
+                for (let i = 0 ; i < response.data.length; i++) {
+                    const grade = response.data[i];
+                    if (!students.has(grade.studentName)){
+                        students.set(grade.studentName, []);
+                    }
+                    if (grade.grade !== null ) {
+                        students.get(grade.studentName).push(grade.grade);
+                    }
+                }
+
+                let studentGrades = [];
+                for (var [name, gradesArray] of students) {
+                    studentGrades.push({
+                        studentName: name,
+                        grade: averageMeanGrade(gradesArray)
+                    });
+                }
+
+                this.setState({loading:false, error: null, students: studentGrades});
+            })
+            .catch(error => {
+                let err = "";
+                if (error.response.status === 401){
+                    err = "The API key '" + this.state.key + "' has not permission to use the 'grades' endpoint. Please request an admin to grant permissions to use that endpoint or use a different API key";
+                } else {
+                    err = error.message;
+                }
+                this.setState({loading:false, error: err})
+
+            })
+    };
+
+    unselectCourse = () => {
+        this.setState({course: null});
+    };
 
     render() {
-        return (
-            <div className="App">
-                <Menu fixed='top' inverted>
-                    <Container>
-                        <Menu.Item as='a' header>
-                            <Image size='mini' src={l} style={{marginRight: '1.5em'}}/>
-                            Random Group Generator
-                        </Menu.Item>
+        const course = this.state.course;
+        let breadcrumb;
+        if (course != null) {
+            breadcrumb = <Breadcrumb>
+                <Breadcrumb.Section link onClick={() => {this.resetKey()}}>Key Selection</Breadcrumb.Section>
+                <Breadcrumb.Divider icon='right angle' />
+                <Breadcrumb.Section link onClick={() => {this.unselectCourse()}}>Select course</Breadcrumb.Section>
+                <Breadcrumb.Divider icon='right angle' />
+                <Breadcrumb.Section active>Group Generation</Breadcrumb.Section>
+            </Breadcrumb>
+        } else {
+            breadcrumb = <Breadcrumb>
+                <Breadcrumb.Section link onClick={() => {this.resetKey()}}>Key Selection</Breadcrumb.Section>
+                <Breadcrumb.Divider icon='right angle' />
+                <Breadcrumb.Section active>Select course</Breadcrumb.Section>
+            </Breadcrumb>
+        }
 
-                        {this.state.key ? (
-                            <Menu.Menu position='right'>
-                                <Menu.Item>
-                                    <Icon name='key'/>
-                                    <Popup trigger={<div>{this.state.key.length > 12 ? this.state.key.substring(0,12) + "..." : this.state.key} </div>}>
-                                        Current key: {this.state.key}
-                                    </Popup>
-                                </Menu.Item>
-                                <Menu.Item>
-                                    <Button size='mini' onClick={this.resetKey}>Change key</Button>
-                                </Menu.Item>
-                            </Menu.Menu>
-                        ) : (
-                            <Menu.Menu position='right'>
-                                <Menu.Item>
-                                    <Input icon='key' iconPosition='left' placeholder='Enter Key ...'
-                                           onChange={this.onKeyChange}
-                                           action={<Button content="Apply" onClick={this.submitKey}/>}/>
-                                </Menu.Item>
-                            </Menu.Menu>
+        let mainContent = null;
+        if (this.state.error == null){
+            if (this.state.key) {
+                mainContent =
+                    <Container>
+                        <div>{breadcrumb}</div>
+                        {this.state.course ? (
+                            <GroupGenerator course={this.state.course} studentList={this.state.students}/>
+                        ):(
+                            <CourseSelector coursesList={this.state.coursesList} courseSelected={this.onCourseSelected}/>
                         )}
                     </Container>
-                </Menu>
+            } else {
+                mainContent =
+                    <Segment>
+                        <Header as='h1'>Welcome to Random Group Generator</Header>
+                        <p>Please insert your API KEY to start using the application</p>
+                    </Segment>
+            }
+        }
 
+        return (
+            <div>
+                <MainMenu apikey={this.state.key} resetKey={this.resetKey} submitKey={this.setKey}/>
                 <Container style={{marginTop: '7em'}}>
-                    {this.state.key ? (
-
-                            <CourseSelector coursesList={this.state.coursesList} courseSelected={this.onCourseSelected}/>
-                    ) : (
-                        <Segment>
-                            <Header as='h1'>Welcome to Random Group Generator</Header>
-                            <p>Please insert your API KEY to start using the application</p>
-                        </Segment>
-                    )}
+                    {this.state.loading === true ? (
+                            <Dimmer active inverted>
+                                <Loader inverted>Loading</Loader>
+                            </Dimmer>
+                    ): null}
+                    {this.state.error ? (
+                        <Message negative>
+                            <Message.Header>We're sorry an error occured</Message.Header>
+                            <p>{this.state.error}</p>
+                        </Message>
+                    ) : (null)}
+                    {mainContent}
                 </Container>
             </div>
-
         );
     }
 }

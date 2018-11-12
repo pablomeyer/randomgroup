@@ -5,10 +5,6 @@ import {
 
 
 class CourseSelector extends Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <Segment>
@@ -19,7 +15,7 @@ class CourseSelector extends Component {
                             <Card
                                 key={course.id}
                                 link
-                                onClick={(e) => {this.props.courseSelected(course.id)}}
+                                onClick={(e) => {this.props.courseSelected(course)}}
                                 header={course.name}
                                 meta={course.id}
                                 description={"From: " + course.startDate + " To: " + course.endDate}
