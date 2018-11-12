@@ -33,4 +33,19 @@ export const averageMeanGrade = (gradeArray) => {
         finalAverageGrade = "-";
     }
     return finalAverageGrade;
-}
+};
+
+
+export const getBaseUrl= () => {
+    const url = localStorage.getItem('baseurl');
+    if (url === null) {
+        return "http://localhost:8080/";
+    }
+    return url;
+
+};
+
+export const saveBaseUrl = async (baseurl) => {
+    localStorage.setItem('baseurl', baseurl)
+};
+

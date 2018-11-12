@@ -13,9 +13,7 @@ import {
 import CourseSelector from "./courseselector";
 import GroupGenerator from "./groupgenerator";
 import MainMenu from "./mainmenu"
-import {averageMeanGrade} from "./helper"
-
-const baseUrl =  "http://localhost:8080/open/v1/";
+import {averageMeanGrade, getBaseUrl} from "./helper"
 
 class App extends Component {
 
@@ -37,16 +35,24 @@ class App extends Component {
         //this.setKey("NS4yMDE4LTExLTAyIDE2OjEzOjE1LjA4MTAzMyAtMDMwMCAtMDMgbT0rMzU1OC40MzAyMjk1NzA");
     }
 
+    static buildurl(path) {
+        let url = getBaseUrl();
+        if (!url.endsWith("/")){
+            url += "/";
+        }
+        return url + path;
+    }
+
     setKey = (key) => {
         this.setState({key: key, loading: true, error: null, course: null, coursesList: []});
-        axios.post(baseUrl + "me", null, {headers: {'Content-Type': 'application/json', 'apiKey': key}}
+        axios.post(this.buildurl("open/v1/me"), null, {headers: {'Content-Type': 'application/json', 'apiKey': key}}
         ).then(response => {
             console.log(response);
             this.setState({coursesList: response.data.courses, error: null, loading: false});
         }).catch(error => {
             console.log(error);
             let err = "";
-            if (error.response.status === 401){
+            if (error.response && error.response.status === 401){
                 err = "The API key '" + this.state.key + "' is invalid. Please insert a valid key to use";
             } else {
                 err = error.message
@@ -64,7 +70,7 @@ class App extends Component {
         console.log("Clicked " + course);
         this.setState({course: course});
         let payload = { "courseId": course.id};
-        axios.post(baseUrl + "grades", payload, {headers: {'Content-Type': 'application/json', 'apiKey': this.state.key}})
+        axios.post(this.buildurl("open/v1/grades"), payload, {headers: {'Content-Type': 'application/json', 'apiKey': this.state.key}})
             .then(response => {
                 console.log("Grades Response");
                 console.log(response);
@@ -91,7 +97,7 @@ class App extends Component {
             })
             .catch(error => {
                 let err = "";
-                if (error.response.status === 401){
+                if (error.response && error.response.status === 401){
                     err = "The API key '" + this.state.key + "' has not permission to use the 'grades' endpoint. Please request an admin to grant permissions to use that endpoint or use a different API key";
                 } else {
                     err = error.message;
