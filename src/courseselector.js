@@ -1,28 +1,47 @@
 import React, {Component} from 'react';
 import {
-    Card, Segment, Header
+    Table, Segment, Header
 } from 'semantic-ui-react'
 
 
 class CourseSelector extends Component {
     render() {
         return (
-            <Segment>
+            <Segment vertical>
                 <Header>Select the course to work with</Header>
-                <Card.Group>
+                <Table selectable basic>
+                    <Table.Header>
+                        <Table.Row>
+                            <Table.HeaderCell>Name</Table.HeaderCell>
+                            <Table.HeaderCell>Id</Table.HeaderCell>
+                            <Table.HeaderCell>Start Date</Table.HeaderCell>
+                            <Table.HeaderCell>End Date</Table.HeaderCell>
+                        </Table.Row>
+                    </Table.Header>
+                    <Table.Body>
                     {this.props.coursesList.map((course) => {
                         return(
-                            <Card
+                            <Table.Row
                                 key={course.id}
-                                link
                                 onClick={(e) => {this.props.courseSelected(course)}}
-                                header={course.name}
-                                meta={course.id}
-                                description={"From: " + course.startDate + " To: " + course.endDate}
-                            />
+                            >
+                                <Table.Cell>
+                                    {course.name}
+                                </Table.Cell>
+                                <Table.Cell>
+                                    {course.id}
+                                </Table.Cell>
+                                <Table.Cell>
+                                    {course.startDate}
+                                </Table.Cell>
+                                <Table.Cell>
+                                    {course.endDate}
+                                </Table.Cell>
+                            </Table.Row>
                             )
                     })}
-                </Card.Group>
+                    </Table.Body>
+                </Table>
             </Segment>
         )
     }
