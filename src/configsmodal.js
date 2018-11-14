@@ -13,7 +13,7 @@ class ConfigsModal extends Component {
 
     saveConfigs = () => {
         saveBaseUrl(this.state.host);
-        this.props.close();
+        this.props.saved();
     };
 
     onBaseUrlChange = (e) => {
@@ -42,7 +42,7 @@ class ConfigsModal extends Component {
                     <Button onClick={this.onCancel} negative>
                         Cancel
                     </Button>
-                    <Button onClick={this.saveConfigs} positive>
+                    <Button onClick={this.saveConfigs} disabled={this.state.host === getBaseUrl()} positive>
                         Save
                     </Button>
 

@@ -13,7 +13,7 @@ import {
 import CourseSelector from "./courseselector";
 import GroupGenerator from "./groupgenerator";
 import MainMenu from "./mainmenu"
-import {averageMeanGrade, getBaseUrl} from "./helper"
+import {averageMeanGrade, buildurl} from "./helper"
 
 class App extends Component {
 
@@ -21,7 +21,7 @@ class App extends Component {
         super(props);
 
         this.state = {
-            key: null,
+            token: null,
             course: null,
             coursesList: [],
             students: [],
@@ -30,22 +30,9 @@ class App extends Component {
         }
     }
 
-    componentDidMount() {
-        //TODO: Only for demo porpose
-        //this.setKey("NS4yMDE4LTExLTAyIDE2OjEzOjE1LjA4MTAzMyAtMDMwMCAtMDMgbT0rMzU1OC40MzAyMjk1NzA");
-    }
-
-    static buildurl(path) {
-        let url = getBaseUrl();
-        if (!url.endsWith("/")){
-            url += "/";
-        }
-        return url + path;
-    }
-
-    setKey = (key) => {
-        this.setState({key: key, loading: true, error: null, course: null, coursesList: []});
-        axios.post(this.buildurl("open/v1/me"), null, {headers: {'Content-Type': 'application/json', 'apiKey': key}}
+    onLogin = (token) => {
+        this.setState({token: token, loading: true, error: null, course: null, coursesList: []});
+        axios.post(buildurl("open/v1/me"), null, {headers: {'Content-Type': 'application/json', 'authToken': token}}
         ).then(response => {
             console.log(response);
             this.setState({coursesList: response.data.courses, error: null, loading: false});
@@ -53,7 +40,7 @@ class App extends Component {
             console.log(error);
             let err = "";
             if (error.response && error.response.status === 401){
-                err = "The API key '" + this.state.key + "' is invalid. Please insert a valid key to use";
+                err = "The login is invalido or the token has expired. Try to relogin.";
             } else {
                 err = error.message
             }
@@ -61,8 +48,8 @@ class App extends Component {
         })
     };
 
-    resetKey = () => {
-        this.setState({key: null, course: null})
+    logout = () => {
+        this.setState({token: null, course: null, error: null})
     };
 
     onCourseSelected = (course) =>{
@@ -70,7 +57,7 @@ class App extends Component {
         console.log("Clicked " + course);
         this.setState({course: course});
         let payload = { "courseId": course.id};
-        axios.post(this.buildurl("open/v1/grades"), payload, {headers: {'Content-Type': 'application/json', 'apiKey': this.state.key}})
+        axios.post(buildurl("open/v1/grades"), payload, {headers: {'Content-Type': 'application/json', 'authToken': this.state.token}})
             .then(response => {
                 console.log("Grades Response");
                 console.log(response);
@@ -98,7 +85,7 @@ class App extends Component {
             .catch(error => {
                 let err = "";
                 if (error.response && error.response.status === 401){
-                    err = "The API key '" + this.state.key + "' has not permission to use the 'grades' endpoint. Please request an admin to grant permissions to use that endpoint or use a different API key";
+                    err = "Your user has not permission to use the 'grades' endpoint. Please request an admin to grant permissions to use that endpoint.";
                 } else {
                     err = error.message;
                 }
@@ -116,7 +103,7 @@ class App extends Component {
         let breadcrumb;
         if (course != null) {
             breadcrumb = <Breadcrumb>
-                <Breadcrumb.Section link onClick={() => {this.resetKey()}}>Key Selection</Breadcrumb.Section>
+                <Breadcrumb.Section >Random Group Generator</Breadcrumb.Section>
                 <Breadcrumb.Divider icon='right angle' />
                 <Breadcrumb.Section link onClick={() => {this.unselectCourse()}}>Select course</Breadcrumb.Section>
                 <Breadcrumb.Divider icon='right angle' />
@@ -124,7 +111,7 @@ class App extends Component {
             </Breadcrumb>
         } else {
             breadcrumb = <Breadcrumb>
-                <Breadcrumb.Section link onClick={() => {this.resetKey()}}>Key Selection</Breadcrumb.Section>
+                <Breadcrumb.Section >Random Group Generator</Breadcrumb.Section>
                 <Breadcrumb.Divider icon='right angle' />
                 <Breadcrumb.Section active>Select course</Breadcrumb.Section>
             </Breadcrumb>
@@ -132,7 +119,7 @@ class App extends Component {
 
         let mainContent = null;
         if (this.state.error == null){
-            if (this.state.key) {
+            if (this.state.token) {
                 mainContent =
                     <Container>
                         <div>{breadcrumb}</div>
@@ -146,14 +133,14 @@ class App extends Component {
                 mainContent =
                     <Segment>
                         <Header as='h1'>Welcome to Random Group Generator</Header>
-                        <p>Please insert your API KEY to start using the application</p>
+                        <p>Please login to start using the application</p>
                     </Segment>
             }
         }
 
         return (
             <div>
-                <MainMenu apikey={this.state.key} resetKey={this.resetKey} submitKey={this.setKey}/>
+                <MainMenu isLogin={this.state.token != null} onLogout={this.logout} onLogin={this.onLogin}/>
                 <Container style={{marginTop: '7em'}}>
                     {this.state.loading === true ? (
                             <Dimmer active inverted>

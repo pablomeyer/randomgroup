@@ -49,3 +49,10 @@ export const saveBaseUrl = async (baseurl) => {
     localStorage.setItem('baseurl', baseurl)
 };
 
+export const buildurl = (path) => {
+    let url = getBaseUrl();
+    if (!url.endsWith("/")){
+        url += "/";
+    }
+    return url + path;
+};
