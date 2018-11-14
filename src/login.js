@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Input, Modal, Form} from 'semantic-ui-react'
+import {Button, Input, Modal, Form, Message} from 'semantic-ui-react'
 import {buildurl} from "./helper"
 import axios from "axios";
 
@@ -15,7 +15,7 @@ class LoginModal extends Component {
     }
 
     login = () => {
-        this.setState({loading: true});
+        this.setState({loading: true, error: null});
 
         let payload = {
             email: this.state.username,
@@ -69,6 +69,9 @@ class LoginModal extends Component {
                             <label>Password</label>
                             <Input icon='key' type="password" iconPosition='left' placeholder='Password' value={this.state.password} onChange={this.onPasswordChange}/>
                         </Form.Field>
+                        {this.state.error ? (
+                            <Message negative>{this.state.error}</Message>
+                        ):(null)}
                         <Button onClick={this.login} positive fluid>
                             Login
                         </Button>
