@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {
-    Segment, Header, Input, Form, Button, Message, Card
+    Segment, Header, Input, Form, Button, Message, Card, Divider
 } from 'semantic-ui-react'
 
 
@@ -76,50 +76,57 @@ class GroupGenerator extends Component {
     render() {
         return (
             <div style={{marginTop: '1em'}}>
-                <Segment>
-                    <Header>Generate Group</Header>
-                    <Message
-                        content={"Course '" + this.props.course.name + "' with " + this.props.studentList.length + " students"}
-                    />
+                <div>
+                    <Header as="h2">Generate Group</Header>
+                    <Header as="h4" content={"Course '" + this.props.course.name + "' with " + this.props.studentList.length + " students"}/>
+
+                    <Message info>
+                        <Message.Header>Groups types</Message.Header>
+                        <Message.List>
+                            <Message.Item>Random: Full random group generation</Message.Item>
+                            <Message.Item>Even Dispersion: Generate random groups with even grades
+                                dispersion</Message.Item>
+                        </Message.List>
+                    </Message>
+
                     <Form>
-                        <Form.Field error={this.state.error ? true: false}>
+                        <Form.Field error={this.state.error ? true: false} width={4}>
                             <label>Group Size:</label>
                             <Input icon='hashtag' type="number" iconPosition='left' placeholder='Users per group' onChange={this.onGroupSizeChange}/>
                         </Form.Field>
                         {this.state.error ? (
                             <Message negative content={this.state.error} />
                         ):(null)}
-                        <Message info>
-                            <Message.Header>Groups types</Message.Header>
-                            <Message.List>
-                                <Message.Item>Random: Full random group generation</Message.Item>
-                                <Message.Item>Even Dispersion: Generate random groups with even grades dispersion</Message.Item>
-                            </Message.List>
-                        </Message>
+
+
                         <div>
                             <Button primary onClick={this.generateRandom}>Random</Button>
                             <Button secondary onClick={this.generateEvenDispersion}>Even Dispersion</Button>
                         </div>
                     </Form>
-                </Segment>
+                </div>
+
                 {this.state.studentGroups ? (
-                    <Segment>
-                        <Header as="h2">Student Groups</Header>
+                    <div>
+                        <Divider/>
+                        <Header as="h3">Student Groups</Header>
                         {this.state.studentGroups.map((group, index) => {
                             return (
-                                <Segment>
-                                    <Header>Group {index+1}</Header>
+                                <div>
+                                    <Header as="h4">Group {index+1}</Header>
                                     <Card.Group>
                                         {group.map((student) => {
                                             return <Card
+                                                image="/cardUser.jpg"
                                                 key={student.studentName}
                                                 header={student.studentName}
                                                 meta={"Average Grade: "+ student.grade}/>
                                         })}
                                     </Card.Group>
-                                </Segment>)
+                                    <Divider hidden/>
+                                </div>)
                         })}
-                    </Segment>
+                    </div>
                 ) : (null)}
             </div>
         )

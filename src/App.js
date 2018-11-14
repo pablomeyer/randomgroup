@@ -122,7 +122,7 @@ class App extends Component {
             if (this.state.token) {
                 mainContent =
                     <Container>
-                        <div style={{marginBottom: '20px'}}>{breadcrumb}</div>
+                        <div style={{marginBottom: '30px'}}>{breadcrumb}</div>
                         {this.state.course ? (
                             <GroupGenerator course={this.state.course} studentList={this.state.students}/>
                         ):(

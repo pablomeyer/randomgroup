@@ -8,7 +8,7 @@ class CourseSelector extends Component {
     render() {
         return (
             <Segment vertical>
-                <Header>Select the course to work with</Header>
+                <Header as="h2">Select the course to work with</Header>
                 <Table selectable basic>
                     <Table.Header>
                         <Table.Row>
