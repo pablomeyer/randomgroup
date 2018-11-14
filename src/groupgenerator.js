@@ -51,10 +51,69 @@ class GroupGenerator extends Component {
 
     generateEvenDispersion = () => {
         const error = this.validateInput();
-        if (error !== ""){
+        if (error !== "") {
             this.setState({error: error});
             return;
         }
+
+        const studentsPerGroup = parseInt(this.state.groupSize);
+        let pendingStudents = this.props.studentList.slice();
+        pendingStudents = pendingStudents.map((ps) => {
+            const simplifiedGrade = (ps.grade[0] !== '-') ? ps.grade[0] : 'I';
+            return {...ps, simplifiedGrade: simplifiedGrade}
+        });
+
+        pendingStudents = pendingStudents.sort(function (a, b) {
+            if (a.simplifiedGrade > b.simplifiedGrade) return 1;
+            if (a.simplifiedGrade < b.simplifiedGrade) return -1;
+            return 0;
+        });
+
+        let gradeGroupsMap = new Map();
+        let curGrade = '';
+        let group = [];
+        pendingStudents.forEach((ps) => {
+            if(ps.simplifiedGrade !== curGrade){
+                if(curGrade != '') {
+                    gradeGroupsMap.set(curGrade, group);
+                }
+
+                group = [];
+                curGrade = ps.simplifiedGrade;
+            }
+
+            group.push(ps);
+        });
+        gradeGroupsMap.set(curGrade, group);
+        // TODO: randomize simplifiedGrade groups in map
+
+        const availableGradeGroups = [...gradeGroupsMap.keys()];
+        const availableStudentsList = [];
+        availableGradeGroups.forEach((gg)=>{
+           availableStudentsList.push(...gradeGroupsMap.get(gg));
+        });
+
+        let groups = [];
+        const cantGroups =  Math.ceil(availableStudentsList.length / studentsPerGroup);
+        while(availableStudentsList.length > 0){
+            for(let i=0; i<cantGroups && availableStudentsList.length > 0; i++){
+                const curGroup = groups[i] || [];
+                curGroup.push(availableStudentsList[0]);
+                availableStudentsList.splice(0, 1);
+                groups[i] = curGroup;
+            }
+
+            for(let i=(cantGroups-1); i>=0 && availableStudentsList.length > 0; i--){
+                console.log(i);
+                const curGroup = groups[i] || [];
+                curGroup.push(availableStudentsList[0]);
+                availableStudentsList.splice(0, 1);
+                groups[i] = curGroup;
+            }
+        }
+        groups = groups.sort((a,b) => b.length - a.length);
+
+        this.setState({error: null, studentGroups: groups});
     };
 
     validateInput = () => {
