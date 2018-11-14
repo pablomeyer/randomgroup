@@ -2,6 +2,7 @@ import React, {Component} from 'react';
 import {
     Table, Segment, Header
 } from 'semantic-ui-react'
+import moment from 'moment';
 
 
 class CourseSelector extends Component {
@@ -20,6 +21,8 @@ class CourseSelector extends Component {
                     </Table.Header>
                     <Table.Body>
                     {this.props.coursesList.map((course) => {
+                        const startDate = moment(course.startDate).format('MM-DD-YYYY');
+                        const endDate = moment(course.endDate).format('MM-DD-YYYY');
                         return(
                             <Table.Row
                                 key={course.id}
@@ -32,10 +35,10 @@ class CourseSelector extends Component {
                                     {course.id}
                                 </Table.Cell>
                                 <Table.Cell>
-                                    {course.startDate}
+                                    {startDate}
                                 </Table.Cell>
                                 <Table.Cell>
-                                    {course.endDate}
+                                    {endDate}
                                 </Table.Cell>
                             </Table.Row>
                             )
