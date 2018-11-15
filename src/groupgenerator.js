@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {
-    Segment, Header, Input, Form, Button, Message, Card, Divider
+    Header, Input, Form, Button, Message, Card, Divider
 } from 'semantic-ui-react'
 
 
@@ -12,6 +12,14 @@ class GroupGenerator extends Component {
             studentGroups : null,
             groupSize : 0,
         }
+    }
+
+    shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
     }
 
     onGroupSizeChange = (e) => {
@@ -59,7 +67,7 @@ class GroupGenerator extends Component {
         const studentsPerGroup = parseInt(this.state.groupSize);
         let pendingStudents = this.props.studentList.slice();
         pendingStudents = pendingStudents.map((ps) => {
-            const simplifiedGrade = (ps.grade[0] !== '-') ? ps.grade[0] : 'I';
+            const simplifiedGrade = (ps.grade[0] !== '-') ? ps.grade[0] : 'C';
             return {...ps, simplifiedGrade: simplifiedGrade}
         });
 
@@ -85,12 +93,11 @@ class GroupGenerator extends Component {
             group.push(ps);
         });
         gradeGroupsMap.set(curGrade, group);
-        // TODO: randomize simplifiedGrade groups in map
 
         const availableGradeGroups = [...gradeGroupsMap.keys()];
         const availableStudentsList = [];
         availableGradeGroups.forEach((gg)=>{
-           availableStudentsList.push(...gradeGroupsMap.get(gg));
+           availableStudentsList.push(...this.shuffleArray(gradeGroupsMap.get(gg)));
         });
 
         let groups = [];
