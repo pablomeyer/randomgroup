@@ -7,9 +7,9 @@ import {
     Button,
     Breadcrumb,
     Loader,
-    Dimmer,
     Message,
-    Icon
+    Icon,
+    Modal
 } from 'semantic-ui-react'
 import CourseSelector from "./courseselector";
 import GroupGenerator from "./groupgenerator";
@@ -162,13 +162,11 @@ class App extends Component {
 
         return (
             <div>
+                <Modal basic dimmer={'inverted'} open={this.state.loading}>
+                    <Loader inverted>Loading</Loader>
+                </Modal>
                 <MainMenu isLogin={this.state.token != null} onLogout={this.logout} onLogin={this.onLogin}/>
                 <Container style={{marginTop: '7em'}}>
-                    {this.state.loading === true ? (
-                            <Dimmer active inverted>
-                                <Loader inverted>Loading</Loader>
-                            </Dimmer>
-                    ): null}
                     {this.state.error ? (
                         <Message negative>
                             <Message.Header>We're sorry an error occured</Message.Header>
