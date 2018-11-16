@@ -34,11 +34,11 @@ class App extends Component {
     }
 
     onLogin = (token) => {
-        this.setState({token: token, loading: true, error: null, course: null, coursesList: []});
+        this.setState({showingLogin : false, token: token, loading: true, error: null, course: null, coursesList: []});
         axios.post(buildurl("open/v1/me"), null, {headers: {'Content-Type': 'application/json', 'authToken': token}}
         ).then(response => {
             console.log(response);
-            this.setState({coursesList: response.data.courses, error: null, loading: false, showingLogin : false});
+            this.setState({coursesList: response.data.courses, error: null, loading: false});
         }).catch(error => {
             console.log(error);
             let err = "";
@@ -56,9 +56,8 @@ class App extends Component {
     };
 
     onCourseSelected = (course) =>{
-        this.setState({loading: false});
+        this.setState({loading: true, error: null});
         console.log("Clicked " + course);
-        this.setState({course: course});
         let payload = { "courseId": course.id};
         axios.post(buildurl("open/v1/grades"), payload, {headers: {'Content-Type': 'application/json', 'authToken': this.state.token}})
             .then(response => {
@@ -83,12 +82,12 @@ class App extends Component {
                     });
                 }
 
-                this.setState({loading:false, error: null, students: studentGrades});
+                this.setState({loading:false, error: null, course: course, students: studentGrades});
             })
             .catch(error => {
                 let err = "";
                 if (error.response && error.response.status === 401){
-                    err = "Your user has not permission to use the 'grades' endpoint. Please request an admin to grant permissions to use that endpoint.";
+                    err = "You don't have permissions to get the grades for this course. Your user might not have permission to use the 'grades' endpoint or is not part of the staff for this course. Please request an admin to grant permissions to use that endpoint.";
                 } else {
                     err = error.message;
                 }
@@ -111,7 +110,6 @@ class App extends Component {
 
     render() {
         const course = this.state.course;
-        const isLogin = this.props.isLogin;
 
         let breadcrumb;
         if (course != null) {
@@ -131,36 +129,35 @@ class App extends Component {
         }
 
         let mainContent = null;
-        if (this.state.error == null){
-            if (this.state.token) {
-                mainContent =
-                    <Container>
-                        <div style={{marginBottom: '30px'}}>{breadcrumb}</div>
-                        {this.state.course ? (
-                            <GroupGenerator course={this.state.course} studentList={this.state.students}/>
-                        ):(
-                            <CourseSelector coursesList={this.state.coursesList} courseSelected={this.onCourseSelected}/>
-                        )}
-                    </Container>
-            } else {
-                mainContent =
-                    <Container text textAlign="center">
-                        <Header
-                            as='h1'
-                            content='Welcome to Random Group Generator'
-                            style={{
-                                fontSize: '2.5em',
-                                fontWeight: 'normal',
-                                marginBottom: '1em',
-                                marginTop: '4em',
-                            }}
-                        />
-                        <Button primary size='huge' onClick={this.showLogin}>
-                            Get Started
-                            <Icon name='right arrow' />
-                        </Button>
-                    </Container>
-            }
+        if (this.state.token) {
+            mainContent =
+                <Container>
+                    <div style={{marginBottom: '30px'}}>{breadcrumb}</div>
+                    {this.state.course ? (
+                        <GroupGenerator course={this.state.course} studentList={this.state.students}/>
+                    ):(
+
+                        <CourseSelector coursesList={this.state.coursesList} courseSelected={this.onCourseSelected}/>
+                    )}
+                </Container>
+        } else {
+            mainContent =
+                <Container text textAlign="center">
+                    <Header
+                        as='h1'
+                        content='Welcome to Random Group Generator'
+                        style={{
+                            fontSize: '2.5em',
+                            fontWeight: 'normal',
+                            marginBottom: '1em',
+                            marginTop: '4em',
+                        }}
+                    />
+                    <Button primary size='huge' onClick={this.showLogin}>
+                        Get Started
+                        <Icon name='right arrow' />
+                    </Button>
+                </Container>
         }
 
         return (
