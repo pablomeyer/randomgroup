@@ -2,7 +2,6 @@ import React, {Component} from 'react';
 import {Container, Menu, Image, Icon, Button} from 'semantic-ui-react'
 import l from "./TrilogyEd_Dark.svg";
 import ConfigsModal from "./configsmodal"
-import LoginModal from "./login";
 
 class MainMenu extends Component {
     constructor(props){
@@ -12,11 +11,6 @@ class MainMenu extends Component {
             showingLogin : false
         }
     }
-
-    /*onLogin = (token) => {
-        this.props.onLogin(token);
-        this.setState({showingLogin : false});
-    };*/
 
     showConfig = () => {
         this.setState({showingConfigs: true});
@@ -30,14 +24,6 @@ class MainMenu extends Component {
     closeConfigs = () => {
         this.setState({showingConfigs: false});
     };
-
-    /*showLogin = () => {
-        this.setState({showingLogin : true});
-    }
-
-    closeLogin = () => {
-        this.setState({showingLogin : false});
-    }*/
 
     render() {
         const isLogin = this.props.isLogin;

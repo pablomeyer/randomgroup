@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import {
-    Header, Input, Form, Button, Message, List, Divider, Image, Grid, Card
+    Header, Input, Form, Button, Message, List, Divider, Image, Card
 } from 'semantic-ui-react'
 
 
@@ -82,7 +82,7 @@ class GroupGenerator extends Component {
         let group = [];
         pendingStudents.forEach((ps) => {
             if (ps.simplifiedGrade !== curGrade) {
-                if (curGrade != '') {
+                if (curGrade !== '') {
                     gradeGroupsMap.set(curGrade, group);
                 }
 
