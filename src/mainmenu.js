@@ -49,11 +49,9 @@ class MainMenu extends Component {
                         Random Group Generator
                     </Menu.Item>
                     <Menu.Menu position='right'>
-                        <Menu.Item>
-                        {isLogin ? (
+                        {isLogin ? (<Menu.Item>
                             <Button onClick={()=> {this.props.onLogout()}}>Logout</Button>
-                        ): null }
-                        </Menu.Item>
+                        </Menu.Item>) : null }
                         <Menu.Item icon onClick={this.showConfig} >
                             <Icon name='cog' size='large' />
                         </Menu.Item>
