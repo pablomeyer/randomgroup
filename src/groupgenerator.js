@@ -143,19 +143,12 @@ class GroupGenerator extends Component {
         return (
             <div style={{marginTop: '1em'}}>
                 <div>
-                    <Header as="h2">Generate Group</Header>
-                    <Header as="h4"
-                            content={"Course '" + this.props.course.name + "' with " + this.props.studentList.length + " students"}/>
+                    <Header as="h2">
+                        Generate Groups
+                        <Header.Subheader content={"Course '" + this.props.course.name + "' with " + this.props.studentList.length + " students"}/>
+                    </Header>
 
-                    <Message info>
-                        <Message.Header>Groups types</Message.Header>
-                        <Message.List>
-                            <Message.Item>Random: Full random group generation</Message.Item>
-                            <Message.Item>Even Dispersion: Generate random groups with even grades
-                                dispersion</Message.Item>
-                        </Message.List>
-                    </Message>
-
+                    <Divider hidden/>
                     <Form>
                         <Form.Field error={this.state.error ? true : false} width={4}>
                             <label>Group Size:</label>
@@ -166,6 +159,14 @@ class GroupGenerator extends Component {
                             <Message negative content={this.state.error}/>
                         ) : (null)}
 
+                        <Message info>
+                            <Message.Header>Groups types</Message.Header>
+                            <Message.List>
+                                <Message.Item>Random: Full random group generation</Message.Item>
+                                <Message.Item>Even Dispersion: Generate random groups with even grades
+                                    dispersion</Message.Item>
+                            </Message.List>
+                        </Message>
 
                         <div>
                             <Button primary onClick={this.generateRandom}>Random</Button>
@@ -177,7 +178,7 @@ class GroupGenerator extends Component {
                 {this.state.studentGroups ? (
                     <div>
                         <Divider/>
-                        <Header as="h3">Student Groups</Header>
+                        <Header as="h2">Student Groups</Header>
                         <Card.Group itemsPerRow={3}>
                             {this.state.studentGroups.map((group, index) => {
                                 return (

@@ -4,16 +4,18 @@ import './App.css';
 import {
     Container,
     Header,
-    Segment,
+    Button,
     Breadcrumb,
     Loader,
     Dimmer,
-    Message
+    Message,
+    Icon
 } from 'semantic-ui-react'
 import CourseSelector from "./courseselector";
 import GroupGenerator from "./groupgenerator";
 import MainMenu from "./mainmenu"
 import {averageMeanGrade, buildurl} from "./helper"
+import LoginModal from "./login";
 
 class App extends Component {
 
@@ -26,7 +28,8 @@ class App extends Component {
             coursesList: [],
             students: [],
             loading: false,
-            error : null
+            error : null,
+            showingLogin : false
         }
     }
 
@@ -35,7 +38,7 @@ class App extends Component {
         axios.post(buildurl("open/v1/me"), null, {headers: {'Content-Type': 'application/json', 'authToken': token}}
         ).then(response => {
             console.log(response);
-            this.setState({coursesList: response.data.courses, error: null, loading: false});
+            this.setState({coursesList: response.data.courses, error: null, loading: false, showingLogin : false});
         }).catch(error => {
             console.log(error);
             let err = "";
@@ -98,8 +101,18 @@ class App extends Component {
         this.setState({course: null});
     };
 
+    showLogin = () => {
+        this.setState({showingLogin : true});
+    }
+
+    closeLogin = () => {
+        this.setState({showingLogin : false});
+    }
+
     render() {
         const course = this.state.course;
+        const isLogin = this.props.isLogin;
+
         let breadcrumb;
         if (course != null) {
             breadcrumb = <Breadcrumb>
@@ -131,9 +144,21 @@ class App extends Component {
                     </Container>
             } else {
                 mainContent =
-                    <Container>
-                        <Header as='h1'>Welcome to Random Group Generator</Header>
-                        <p>Please login to start using the application</p>
+                    <Container text textAlign="center">
+                        <Header
+                            as='h1'
+                            content='Welcome to Random Group Generator'
+                            style={{
+                                fontSize: '2.5em',
+                                fontWeight: 'normal',
+                                marginBottom: '1em',
+                                marginTop: '4em',
+                            }}
+                        />
+                        <Button primary size='huge' onClick={this.showLogin}>
+                            Get Started
+                            <Icon name='right arrow' />
+                        </Button>
                     </Container>
             }
         }
@@ -155,6 +180,7 @@ class App extends Component {
                     ) : (null)}
                     {mainContent}
                 </Container>
+                <LoginModal  open={this.state.showingLogin}   close={this.closeLogin} onLogin={this.onLogin}/>
             </div>
         );
     }

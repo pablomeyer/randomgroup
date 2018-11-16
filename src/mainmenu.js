@@ -13,10 +13,10 @@ class MainMenu extends Component {
         }
     }
 
-    onLogin = (token) => {
+    /*onLogin = (token) => {
         this.props.onLogin(token);
         this.setState({showingLogin : false});
-    };
+    };*/
 
     showConfig = () => {
         this.setState({showingConfigs: true});
@@ -31,13 +31,13 @@ class MainMenu extends Component {
         this.setState({showingConfigs: false});
     };
 
-    showLogin = () => {
+    /*showLogin = () => {
         this.setState({showingLogin : true});
     }
 
     closeLogin = () => {
         this.setState({showingLogin : false});
-    }
+    }*/
 
     render() {
         const isLogin = this.props.isLogin;
@@ -52,9 +52,7 @@ class MainMenu extends Component {
                         <Menu.Item>
                         {isLogin ? (
                             <Button onClick={()=> {this.props.onLogout()}}>Logout</Button>
-                        ): (
-                            <Button primary onClick={this.showLogin}>Login</Button>
-                        ) }
+                        ): null }
                         </Menu.Item>
                         <Menu.Item icon onClick={this.showConfig} >
                             <Icon name='cog' size='large' />
@@ -62,7 +60,6 @@ class MainMenu extends Component {
                     </Menu.Menu>
                 </Container>
                 <ConfigsModal open={this.state.showingConfigs} close={this.closeConfigs} saved={this.onConfigSaved}/>
-                <LoginModal   open={this.state.showingLogin}   close={this.closeLogin} onLogin={this.onLogin}/>
             </Menu>
         )
     }
