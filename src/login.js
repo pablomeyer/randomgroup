@@ -63,7 +63,7 @@ class LoginModal extends Component {
                     <Form loading={this.state.loading}>
                         <Form.Field>
                             <label>Username</label>
-                            <Input icon='users' type="email" iconPosition='left' placeholder='Username' value={this.state.username} onChange={this.onUsernameChange}/>
+                            <Input icon='user' type="email" iconPosition='left' placeholder='Username' value={this.state.username} onChange={this.onUsernameChange}/>
                         </Form.Field>
                         <Form.Field>
                             <label>Password</label>

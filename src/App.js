@@ -131,10 +131,10 @@ class App extends Component {
                     </Container>
             } else {
                 mainContent =
-                    <Segment>
+                    <Container>
                         <Header as='h1'>Welcome to Random Group Generator</Header>
                         <p>Please login to start using the application</p>
-                    </Segment>
+                    </Container>
             }
         }
 
