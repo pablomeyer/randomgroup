@@ -182,7 +182,7 @@ class GroupGenerator extends Component {
                         <Card.Group itemsPerRow={3}>
                             {this.state.studentGroups.map((group, index) => {
                                 return (
-                                    <Card>
+                                    <Card key={index}>
                                         <Header style={{margin: '.8rem'}}>Group {index + 1}</Header>
                                         <Card.Content>
                                             <List>
