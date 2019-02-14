@@ -37,13 +37,15 @@ class App extends Component {
         this.setState({showingLogin : false, token: token, loading: true, error: null, course: null, coursesList: []});
         axios.post(buildurl("open/v1/me"), null, {headers: {'Content-Type': 'application/json', 'authToken': token}}
         ).then(response => {
-            console.log(response);
-            this.setState({coursesList: response.data.courses, error: null, loading: false});
+            let courses = [];
+            response.data.enrollments.map((enrollment) => {
+               courses.push(enrollment.course);
+            });
+            this.setState({coursesList: courses, error: null, loading: false});
         }).catch(error => {
-            console.log(error);
             let err = "";
             if (error.response && error.response.status === 401){
-                err = "The login is invalido or the token has expired. Try to relogin.";
+                err = "The login is invalid or the token has expired. Try to relogin.";
             } else {
                 err = error.message
             }
@@ -57,7 +59,6 @@ class App extends Component {
 
     onCourseSelected = (course) =>{
         this.setState({loading: true, error: null});
-        console.log("Clicked " + course);
         let payload = { "courseId": course.id};
         axios.post(buildurl("open/v1/grades"), payload, {headers: {'Content-Type': 'application/json', 'authToken': this.state.token}})
             .then(response => {
@@ -87,7 +88,7 @@ class App extends Component {
             .catch(error => {
                 let err = "";
                 if (error.response && error.response.status === 401){
-                    err = "You don't have permissions to get the grades for this course. Your user might not have permission to use the 'grades' endpoint or is not part of the staff for this course. Please request an admin to grant permissions to use that endpoint.";
+                    err = "You don't have permissions to get the grades for this course. Your must be part of the staff or admin.";
                 } else {
                     err = error.message;
                 }
