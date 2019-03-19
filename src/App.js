@@ -35,7 +35,7 @@ class App extends Component {
 
     onLogin = (token) => {
         this.setState({showingLogin : false, token: token, loading: true, error: null, course: null, coursesList: []});
-        axios.post(buildurl("open/v1/me"), null, {headers: {'Content-Type': 'application/json', 'authToken': token}}
+        axios.post(buildurl("api/instructor/v1/me"), null, {headers: {'Content-Type': 'application/json', 'authToken': token}}
         ).then(response => {
             let courses = [];
             response.data.enrollments.map((enrollment) => {
@@ -60,7 +60,7 @@ class App extends Component {
     onCourseSelected = (course) =>{
         this.setState({loading: true, error: null});
         let payload = { "courseId": course.id};
-        axios.post(buildurl("open/v1/grades"), payload, {headers: {'Content-Type': 'application/json', 'authToken': this.state.token}})
+        axios.post(buildurl("api/instructor/v1/grades"), payload, {headers: {'Content-Type': 'application/json', 'authToken': this.state.token}})
             .then(response => {
                 console.log("Grades Response");
                 console.log(response);

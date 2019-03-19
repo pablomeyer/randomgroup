@@ -21,7 +21,7 @@ class LoginModal extends Component {
             email: this.state.username,
             password: this.state.password
         }
-        axios.post(buildurl("open/v1/login"), payload, {headers: {'Content-Type': 'application/json'}})
+        axios.post(buildurl("api/instructor/v1/login"), payload, {headers: {'Content-Type': 'application/json'}})
             .then(response => {
                 let error = null;
                 if (response.data && response.data.success === true && response.data.authenticationInfo && response.data.authenticationInfo.authToken) {
